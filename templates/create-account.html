@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Create Account
+{% endblock %}
+
+{% block body %}
+	<div class="container">
+		<div class="row justify-content-center mt-5">
+			<div class="col-12 col-sm-10 col-md-8 col-lg-6 text-center">
+				<h3>Create your account </h3>
+			</div>
+		</div>
+		<div class="row justify-content-center">			
+			{% if message == 1 %}
+				<div class="col-12 col-sm-10 col-md-8 col-lg-6 alert alert-danger alert-dismissible fade show mt-2" role="alert">
+				  	Username or Email are already used
+				  	<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+				    	<span aria-hidden="true">&times;</span>
+				  	</button>
+				</div>
+			{% endif %}
+		</div>
+		<div class="row justify-content-center mb-5">
+			<div class="col-12 col-sm-10 col-md-8 col-lg-6 sign-up">
+				<form action="{{ url_for('register') }}" method="post">
+				  	<div class="form-group mt-4">
+					    <label for="InputUserCreateAccount">Username *</label>
+					    <input type="name" name="name" class="form-control" id="InputUserCreateAccount" required>
+				  	</div>
+				  	<div class="form-group">
+					    <label for="InputEmailCreateAccount">Email *</label>
+					    <input type="email" name="email" class="form-control" id="InputEmailCreateAccount" required>
+				  	</div>
+				  	<div class="form-group">
+					    <label for="InputPasswordCreateAccount">Password *</label>
+					    <input type="password" name="password" class="form-control" id="InputPasswordCreateAccount" required>
+				  	</div>
+				  	 <div class="text-right mt-4 mb-3">
+				  	<button type="submit" class="btn btn-success btn-block">Submit</button>
+				  </div>
+				</form>
+			</div>
+		</div>
+	</div>
+{% endblock %}

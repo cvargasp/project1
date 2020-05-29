@@ -1,0 +1,83 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Search
+{% endblock %}
+
+{% block body %}
+{% if message == 1 %}
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+		  	<div class="modal-content">
+		   		<div class="modal-header">
+		    		<h5 class="modal-title" id="exampleModalLongTitle">Warning</h5>
+		    		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		      		<span aria-hidden="true">&times;</span>
+		    	</button>
+			   	</div>
+			   	<div class="modal-body">
+			    You must fill in one of the fields.
+			   	</div>
+			   	<div class="modal-footer">
+			    	<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+			   	</div>
+			</div>
+		</div>
+	</div>
+{% endif %}
+	<div id="parallax-image">
+		<div class="container vertical-center">
+			<div class="row justify-content-center mb-5 h-100">
+				<div class="col-12 col-sm-10 col-md-8 col-lg-6 sign-up align-self-center">
+					{% if session["message"] == 1 %}
+						<div class="alert alert-success alert-dismissible fade show mt-5" role="alert">
+						  	<strong>Welcome {{ username }}!</strong> Now you can search in our library.
+						  	<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+						    	<span aria-hidden="true">&times;</span>
+						  	</button>
+						</div>
+					{% endif %}
+					{% if session["message"] == 2 %}
+						<div class="alert alert-danger alert-dismissible fade show mt-5" role="alert">
+						  	You must fill one of the fields.
+						  	<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+						    	<span aria-hidden="true">&times;</span>
+						  	</button>
+						</div>
+					{% endif %}
+					{% if session["message"] == 3 %}
+						<div class="alert alert-danger alert-dismissible fade show mt-5" role="alert">
+						  	<strong>Sorry!</strong> There are no results.
+						  	<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+						    	<span aria-hidden="true">&times;</span>
+						  	</button>
+						</div>
+					{% endif %}
+					<form action="{{ url_for('search') }}" method="post">						
+					  	<div class="form-group">
+						    <label for="InputIsbnBook">ISBN Number</label>
+						    <input type="text" name="isbnBook" class="form-control" id="InputIsbnBook">
+					  	</div>
+					  	<div class="form-group">
+						    <label for="InputTitleBook">Title</label>
+						    <input type="text" name="titleBook" class="form-control" id="InputTitleBook">
+					  	</div>
+					  	<div class="form-group">
+						    <label for="InputAuthorBook">Author</label>
+						    <input type="text" name="authorBook" class="form-control" id="InputAuthorBook">
+					  	</div>
+					  	<div class="text-right mt-4 mb-3">
+					  		<button type="submit" class="btn btn-success btn-block">Search</button>
+					  	</div>
+					  	
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+    $(window).on('load',function(){
+        $('#myModal').modal('show');
+    });
+</script>
+{% endblock %}

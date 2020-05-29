@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+{% block body %}
+	<div class="container">
+		<div class="row justify-content-center mt-5">
+			<div class="col-7 col-sm-7 col-md-5 col-lg-4 col-xl-3 text-center">
+				<h3>Log in to Bookiview</h3>				
+			</div>
+		</div>
+		<div class="row justify-content-center">
+			{% if message == 3 %}
+				<div class="col-7 col-sm-7 col-md-5 col-lg-4 col-xl-3 alert alert-danger alert-dismissible fade show" role="alert">
+				  	Incorrect username o password.
+				  	<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+				    	<span aria-hidden="true">&times;</span>
+				  	</button>
+				</div>
+			{% endif %}
+		</div>
+		<div class="row justify-content-center mt-3">
+			<div class="col-7 col-sm-7 col-md-5 col-lg-4 col-xl-3 login p-3">				
+				<form action="{{ url_for('login') }}" method="post">
+				  	<div class="form-group">
+					    <label for="InputUserLogin">Username</label>
+					    <input type="name" name="name" class="form-control" id="InputUserLogin" required>
+				  	</div>
+				  	<div class="form-group">
+					    <label for="InputPasswordLogin">Password</label>
+					    <input type="password" name="password" class="form-control" id="InputPasswordLogin" required>
+				  	</div>
+				  	 <div class="text-right mt-4 mb-3">
+				  	<button type="submit" class="btn btn-success btn-block">Submit</button>
+				  </div>
+				</form>
+			</div>
+		</div>
+		<div class="row justify-content-center mt-4 mb-5">
+			<div class="col-7 col-sm-7 col-md-5 col-lg-4 col-xl-3 login p-3">
+				New to Bookiview? <a href="{{ url_for('register') }}">Create an account.</a>
+			</div>
+		</div>
+	</div>
+{% endblock %}

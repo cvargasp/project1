@@ -41,3 +41,31 @@ div > span > a{
 .table-row{
 cursor:pointer;
 }
+
+.starrating > input {
+	display: none;
+
+.starrating > label:before { 
+  content: "\f005";
+  margin: 2px;
+  font-size: 1.5em;
+  font-family: FontAwesome;
+  display: inline-block; 
+}
+
+.starrating > label
+{
+  color: #adadad;
+}
+
+.starrating > input:checked ~ label{
+	color: #ffca08 ; 
+}
+
+.starrating > input:hover ~ label{
+	color: #ffca08 ;  
+}
+
+.goodreads-rating{
+	color: #ffca08;
+}

@@ -90,18 +90,21 @@ def search():
 @app.route("/book/<isbn>", methods=['GET', 'POST'])
 def book(isbn):
 	if request.method == "POST":
-		rating = request.form.get("ratingRadios")
+		rating = request.form.get("rating")
 		review = request.form.get("reviewTextarea")
 		if (rating == None) | (review == ""):
 			return redirect(url_for('book',isbn=isbn))		
 		book = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn": isbn}).fetchone()
-		user = db.execute("SELECT id FROM users_bookiview WHERE name = :name", {"name": session["name"]}).fetchone()
 		reviews = db.execute("SELECT * FROM reviews JOIN users_bookiview ON users_bookiview.id = reviews.user_id WHERE reviews.book_id = :book_id", {"book_id": book.id}).fetchall()
-		db.execute("INSERT INTO reviews (user_id, book_id, review, rating) VALUES (:user_id, :book_id, :review, :rating)", {"user_id": user.id, "book_id": book.id, "review": review, "rating": rating})
+		if db.execute("SELECT * FROM reviews WHERE user_id = :user_id AND book_id = :book_id", {"user_id": session["id"], "book_id": book.id}).fetchall() != 0:
+			db.commit()
+			return redirect(url_for('book',isbn=isbn))
+		db.execute("INSERT INTO reviews (user_id, book_id, review, rating) VALUES (:user_id, :book_id, :review, :rating)", {"user_id": session["id"], "book_id": book.id, "review": review, "rating": rating})
 		db.commit()
-		return render_template("book.html", book=book, reviews=reviews)
+		previous_message = True
+		return render_template("book.html", book=book, reviews=reviews, previous_message=previous_message)
 	else:
-		res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": "gCyeIcetWtMLisDbeUW4g", "isbns": "9781632168146"})
+		res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": "gCyeIcetWtMLisDbeUW4g", "isbns": isbn})
 		data = res.json()
 		work_ratings_count = data['books'][0]["work_ratings_count"]
 		rating_count = data['books'][0]["average_rating"]	
@@ -122,9 +125,6 @@ def logout():
 
 @app.route("/api/<isbn>")
 def book_api(isbn):
-    """Return details about a single flight."""
-
-    # Make sure flight exists.
     book = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn": isbn}).fetchone()
     if book is None:
         return jsonify({"error": "Invalid isbn"}), 404

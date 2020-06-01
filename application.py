@@ -127,7 +127,7 @@ def logout():
 def book_api(isbn):
     book = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn": isbn}).fetchone()
     if book is None:
-        return jsonify({"error": "Invalid isbn"}), 404
+        return jsonify({"error": "Invalid ISBN"}), 404
     reviews = db.execute("SELECT * FROM reviews WHERE book_id = :book_id", {"book_id": book.id}).fetchall()
     rating = 0;
     for review in reviews:

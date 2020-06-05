@@ -27,13 +27,17 @@ db = scoped_session(sessionmaker(bind=engine))
 
 @app.route("/")
 def index():
-	if 'loggeg_in' in session:
+	if not 'logged_in' in session:
 		session["logged_in"]=False
 	return render_template("index.html")
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
+	if 'logged_in' in session:
+		if session["logged_in"]:
+			return redirect(url_for('index'))
 	if request.method == "POST":
+		session["registration_message"] = False
 		name = request.form.get("name")
 		password = request.form.get("password")
 		if db.execute("SELECT * FROM users_bookiview WHERE name = :name AND password = crypt(:password, password)", {"name": name, "password": password}).rowcount == 1:
@@ -52,6 +56,9 @@ def login():
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
+	if 'logged_in' in session:
+		if session["logged_in"]:
+			return redirect(url_for('index'))
 	if request.method == "POST":
 		name = request.form.get("name")
 		email = request.form.get("email").lower()
@@ -64,12 +71,16 @@ def register():
 		db.commit()
 		session["name"] = name
 		message = 0
-		return redirect(url_for('index'))
+		session["registration_message"] = True
+		return redirect(url_for('login'))
 	else:
 		return render_template("create-account.html")
 
 @app.route("/search", methods=['GET', 'POST'])
 def search():
+	if 'logged_in' in session:
+		if not session["logged_in"]:
+			return redirect(url_for('login'))
 	if request.method == "POST":
 		isbn = request.form.get("isbnBook")
 		title = request.form.get("titleBook").lower()
@@ -89,33 +100,29 @@ def search():
 
 @app.route("/book/<isbn>", methods=['GET', 'POST'])
 def book(isbn):
+	if 'logged_in' in session:
+		if not session["logged_in"]:
+			return redirect(url_for('login'))
+	book = db.execute("SELECT * FROM books WHERE isbn LIKE :isbn", {"isbn": isbn}).fetchone()
+	reviews = db.execute("SELECT * FROM reviews JOIN users_bookiview ON users_bookiview.id = reviews.user_id WHERE reviews.book_id = :book_id", {"book_id": book.id}).fetchall()
+	previous_review = not (db.execute("SELECT * FROM reviews WHERE user_id = :user_id AND book_id = :book_id", {"user_id": session["id"], "book_id": book.id}).rowcount == 0)
+	db.commit()			
 	if request.method == "POST":
+		if previous_review:	
+			return redirect(url_for('book',isbn=isbn))
 		rating = request.form.get("rating")
 		review = request.form.get("reviewTextarea")
 		if (rating == None) | (review == ""):
-			return redirect(url_for('book',isbn=isbn))		
-		book = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn": isbn}).fetchone()
-		reviews = db.execute("SELECT * FROM reviews JOIN users_bookiview ON users_bookiview.id = reviews.user_id WHERE reviews.book_id = :book_id", {"book_id": book.id}).fetchall()
-		if db.execute("SELECT * FROM reviews WHERE user_id = :user_id AND book_id = :book_id", {"user_id": session["id"], "book_id": book.id}).fetchall() != 0:
-			db.commit()
 			return redirect(url_for('book',isbn=isbn))
 		db.execute("INSERT INTO reviews (user_id, book_id, review, rating) VALUES (:user_id, :book_id, :review, :rating)", {"user_id": session["id"], "book_id": book.id, "review": review, "rating": rating})
 		db.commit()
-		previous_message = True
-		return render_template("book.html", book=book, reviews=reviews, previous_message=previous_message)
+		return redirect(url_for('book',isbn=isbn))
 	else:
 		res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": "gCyeIcetWtMLisDbeUW4g", "isbns": isbn})
 		data = res.json()
 		work_ratings_count = data['books'][0]["work_ratings_count"]
 		rating_count = data['books'][0]["average_rating"]	
-		book = db.execute("SELECT * FROM books WHERE isbn LIKE :isbn", {"isbn": isbn}).fetchone()
-		reviews = db.execute("SELECT * FROM reviews JOIN users_bookiview ON users_bookiview.id = reviews.user_id WHERE reviews.book_id = :book_id", {"book_id": book.id}).fetchall()
-		db.commit()
-		previous_message = False
-		for review in reviews:
-			if review.user_id == session["id"]:
-				previous_message = True
-		return render_template("book.html", book=book, reviews=reviews, work_ratings_count=work_ratings_count, rating_count=rating_count, previous_message=previous_message)
+		return render_template("book.html", book=book, reviews=reviews, work_ratings_count=work_ratings_count, rating_count=rating_count, previous_review = previous_review)
 
 @app.route("/logout")
 def logout():

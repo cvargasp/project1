@@ -14,10 +14,10 @@
 				{% for i in rating_count %}
 					<i class="fas fa-star goodreads-rating"></i>
 					{% endfor %}
-				{{ rating_count }} ({{ work_ratings_count }})</p>
+				{{ rating_count }} ({{ work_ratings_count }} reviews)</p>
 			</div>
 		</div>
-		{% if not previous_message %}
+		{% if not previous_review %}
 		<div class="row justify-content-center">
 			<div class="col-12 col-sm-9 col-md-7">
 				<form action="{{ url_for('book', isbn=book.isbn) }}" method="post">
@@ -51,8 +51,11 @@
 			COMMUNITY REVIEWS
 			<hr>
 			{% for review in reviews %}
-				<span><a>{{ review.name }}</a> rated it {{ review.rating }}</span>
-				<p class="mt-2">{{ review.review }}</p>
+				<span><a>{{ review.name }}</a> rated it 
+					{% for star in range(review.rating) %}
+						<i class="fas fa-star bookiview-rating-star"></i>
+					{% endfor %}</span>
+				<p class="mt-2"><i>"{{ review.review }}"</i></p>
 				<hr>
 			{% endfor%}
 

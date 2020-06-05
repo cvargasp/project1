@@ -41,7 +41,6 @@
 					      			<a class="nav-link" href="{{ url_for('register') }}">Create Account</a>
 					      			<!-- <a class="btn my-2 my-sm-0" type="submit" href="{{ url_for('register') }}">Create Account</a> -->
 					      		</li>
-					      		{{session["logged_in"]}}
 					      	{% else %}	
 					      		<li class="nav-item active">
 					      			<a class="nav-link" href="#">{{ session["name"] }}</a>

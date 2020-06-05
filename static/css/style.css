@@ -44,6 +44,7 @@ cursor:pointer;
 
 .starrating > input {
 	display: none;
+}
 
 .starrating > label:before { 
   content: "\f005";
@@ -68,4 +69,9 @@ cursor:pointer;
 
 .goodreads-rating{
 	color: #ffca08;
+}
+
+.bookiview-rating-star{
+  color: #ffca08;
+  font-size: 10px;
 }
